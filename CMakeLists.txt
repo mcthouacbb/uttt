@@ -10,6 +10,7 @@ endif()
 project(UTTT)
 
 set(SRCS
+    "src/bitboard.h"
     "src/main.cpp"
 )
 
