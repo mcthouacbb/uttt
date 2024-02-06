@@ -10,6 +10,8 @@ endif()
 project(UTTT)
 
 set(SRCS
+    "src/attacks.cpp"
+    "src/attacks.h"
     "src/bitboard.h"
     "src/main.cpp"
 )

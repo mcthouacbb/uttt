@@ -161,7 +161,6 @@ inline std::ostream& operator<<(std::ostream& os, const Bitboard& bitboard)
         os << std::bitset<3>(val) << std::endl;
         v = (v << 3) & IN_BOARD.value();
     }
-    os << std::endl;
     return os;
 }
 

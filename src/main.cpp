@@ -1,18 +1,20 @@
 #include <iostream>
 
 #include "bitboard.h"
+#include "attacks.h"
 
 int main()
 {
-    std::cout << FILE_A;
-    std::cout << FILE_B;
-    std::cout << FILE_C;
-    std::cout << RANK_1;
-    std::cout << RANK_2;
-    std::cout << RANK_3;
-    std::cout << DIAG_A;
-    std::cout << DIAG_B;
-    std::cout << IN_BOARD;
-    std::cout << "Hello World!" << std::endl;
+    for (int i = 0; i < 512; i++)
+    {
+        Bitboard bb(i);
+        std::cout << bb;
+        bool won = attacks::boardIsWon(bb);
+        if (won)
+            std::cout << "Win" << std::endl;
+        else
+            std::cout << "Not winning" << std::endl;
+        std::cout << std::endl;
+    }
     return 0;
 }
