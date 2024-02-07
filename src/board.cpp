@@ -110,7 +110,7 @@ std::string Board::stringRep() const
             str += '\n';
         }
         if (j != 0)
-            str += "------------";
+            str += "-----------";
         str += '\n';
     }
     return str;
