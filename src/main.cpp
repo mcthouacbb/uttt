@@ -39,12 +39,6 @@ uint64_t perft(Board& board, int depth)
 int main()
 {
     Board board;
-    // board.makeMove(Move(board.subBoardIdx(), 0));
-    // board.makeMove(Move(board.subBoardIdx(), 3));
-    // board.makeMove(Move(board.subBoardIdx(), 3));
-    // board.makeMove(Move(board.subBoardIdx(), 7));
-    // board.makeMove(Move(board.subBoardIdx(), 2));
-    board.setToFen("xox x x  xo x x   ox  o          o x  xox x      o    ooo    x     o    o   o x O");
     std::cout << board.stringRep();
     perft(board, 1);
     std::cout << board.stringRep() << std::endl;
@@ -66,5 +60,6 @@ int main()
     std::cout << board.stringRep() << std::endl;
     perft(board, 10);
     std::cout << board.stringRep() << std::endl;
+    board.setToFen("xox x x  xo x x   ox  o          o x  xox x      o    ooo    x     o    o   o x O");
     return 0;
 }
