@@ -13,7 +13,10 @@ set(SRCS
     "src/attacks.cpp"
     "src/attacks.h"
     "src/bitboard.h"
+    "src/board.cpp"
+    "src/board.h"
     "src/main.cpp"
+    "src/types.h"
 )
 
 
