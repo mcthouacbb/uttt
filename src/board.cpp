@@ -1,13 +1,67 @@
 #include "board.h"
 #include "attacks.h"
+#include <cctype>
+#include <array>
 
 Board::Board()
     : m_SideToMove(Color::X)
 {
     m_BoardStates.reserve(128);
     BoardState rootState = {};
-    rootState.subBoardIdx = 4;
+    rootState.subBoardIdx = -1;
     m_BoardStates.push_back(rootState);
+}
+
+void Board::setToFen(std::string_view fen)
+{
+    m_BoardStates.clear();
+    if (fen == "")
+    {
+        BoardState rootState = {};
+        rootState.subBoardIdx = -1;
+        m_BoardStates.push_back(rootState);
+        return;
+    }
+    else
+    {
+        m_BoardStates.push_back({});
+    }
+    // terrible variable name
+    constexpr std::array<int, 9> ORDER = {6, 7, 8, 3, 4, 5, 0, 1, 2};
+    int i = 0;
+    int currSubBoard = -1;
+    for (int subBoard : ORDER)
+    {
+        for (int square : ORDER)
+        {
+            char c = fen[i++];
+            if (std::isupper(c))
+                currSubBoard = subBoard;
+            c = std::tolower(c);
+            if (c == 'x')
+            {
+                state().subBoards[subBoard][static_cast<int>(Color::X)] |= Bitboard::fromSquare(square);
+            }
+            else if (c == 'o')
+            {
+                state().subBoards[subBoard][static_cast<int>(Color::O)] |= Bitboard::fromSquare(square);
+            }
+        }
+    }
+
+    for (int i = 0; i < 9; i++)
+    {
+        if (attacks::boardIsWon(state().subBoards[i][static_cast<int>(Color::X)]))
+            state().won[static_cast<int>(Color::X)] |= Bitboard::fromSquare(i);
+
+        if (attacks::boardIsWon(state().subBoards[i][static_cast<int>(Color::O)]))
+            state().won[static_cast<int>(Color::O)] |= Bitboard::fromSquare(i);
+
+        if ((state().subBoards[i][0] | state().subBoards[i][1]) == IN_BOARD)
+            state().drawn |= Bitboard::fromSquare(i);
+    }
+
+    state().subBoardIdx = currSubBoard;
 }
 
 void Board::makeMove(Move move)

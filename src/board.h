@@ -18,6 +18,8 @@ class Board
 public:
     Board();
 
+    void setToFen(std::string_view fen);
+
     void makeMove(Move move);
     void unmakeMove(Move move);
 
