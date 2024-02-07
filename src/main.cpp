@@ -1,20 +1,16 @@
 #include <iostream>
 
-#include "bitboard.h"
-#include "attacks.h"
+#include "board.h"
 
 int main()
 {
-    for (int i = 0; i < 512; i++)
-    {
-        Bitboard bb(i);
-        std::cout << bb;
-        bool won = attacks::boardIsWon(bb);
-        if (won)
-            std::cout << "Win" << std::endl;
-        else
-            std::cout << "Not winning" << std::endl;
-        std::cout << std::endl;
-    }
+    Board board;
+    board.makeMove(Move(board.subBoardIdx(), 0));
+    board.makeMove(Move(board.subBoardIdx(), 3));
+    board.makeMove(Move(board.subBoardIdx(), 3));
+    board.makeMove(Move(board.subBoardIdx(), 4));
+    board.makeMove(Move(board.subBoardIdx(), 7));
+    board.makeMove(Move(board.subBoardIdx(), 2));
+    std::cout << board.stringRep() << std::endl;
     return 0;
 }
