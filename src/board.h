@@ -2,6 +2,7 @@
 
 #include "types.h"
 #include "bitboard.h"
+#include "attacks.h"
 #include <vector>
 
 struct BoardState
@@ -33,6 +34,9 @@ public:
 
     int subBoardIdx() const;
     Color sideToMove() const;
+
+    bool isWon() const;
+    bool isDrawn() const;
 private:
     BoardState& state();
     const BoardState& state() const;
@@ -92,4 +96,16 @@ inline BoardState& Board::state()
 inline const BoardState& Board::state() const
 {
     return m_BoardStates.back();
+}
+
+inline bool Board::isWon() const
+{
+    // only last player to move could have won the game
+    return attacks::boardIsWon(wonBoards(~m_SideToMove));
+}
+
+inline bool Board::isDrawn() const
+{
+    // does not check for wins, can return false draws
+    return completedBoards() == IN_BOARD;
 }

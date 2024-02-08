@@ -1,5 +1,4 @@
 #include "board.h"
-#include "attacks.h"
 #include <cctype>
 #include <array>
 
@@ -73,7 +72,7 @@ void Board::makeMove(Move move)
     
     if (attacks::boardIsWon(subBoard))
         newState.won[static_cast<int>(m_SideToMove)] |= Bitboard::fromSquare(move.subBoard);
-    if (subBoard == IN_BOARD)
+    if ((newState.subBoards[move.subBoard][0] | newState.subBoards[move.subBoard][1]) == IN_BOARD)
         newState.drawn |= Bitboard::fromSquare(move.subBoard);
 
     newState.subBoardIdx = move.square;

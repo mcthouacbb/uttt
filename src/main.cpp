@@ -1,4 +1,5 @@
 #include <iostream>
+#include <random>
 
 #include "board.h"
 #include "movegen.h"
@@ -36,30 +37,50 @@ uint64_t perft(Board& board, int depth)
     return nodes;
 }
 
-int main()
+enum class GameResult
+{
+    X_WIN, O_WIN, DRAW
+};
+
+GameResult playRandomGame(std::mt19937& rng)
 {
     Board board;
-    std::cout << board.stringRep();
-    perft(board, 1);
-    std::cout << board.stringRep() << std::endl;
-    perft(board, 2);
-    std::cout << board.stringRep() << std::endl;
-    perft(board, 3);
-    std::cout << board.stringRep() << std::endl;
-    perft(board, 4);
-    std::cout << board.stringRep() << std::endl;
-    perft(board, 5);
-    std::cout << board.stringRep() << std::endl;
-    perft(board, 6);
-    std::cout << board.stringRep() << std::endl;
-    perft(board, 7);
-    std::cout << board.stringRep() << std::endl;
-    perft(board, 8);
-    std::cout << board.stringRep() << std::endl;
-    perft(board, 9);
-    std::cout << board.stringRep() << std::endl;
-    perft(board, 10);
-    std::cout << board.stringRep() << std::endl;
-    board.setToFen("xox x x  xo x x   ox  o          o x  xox x      o    ooo    x     o    o   o x O");
+    while (true)
+    {
+        MoveList moves;
+        genMoves(board, moves);
+
+        /*if (moves.size() == 0)
+        {
+            std::cout << board.stringRep() << std::endl;
+            std::cout << board.completedBoards() << std::endl;
+            std::cout << "WHAT?" << std::endl;
+            throw 0;
+        }*/
+        std::uniform_int_distribution<int> dist(0, moves.size() - 1);
+        int idx = dist(rng);
+
+        board.makeMove(moves[idx]);
+
+        if (board.isWon() || board.isDrawn())
+            break;
+    }
+    // std::cout << board.stringRep() << std::endl;
+    if (board.isWon())
+        return board.sideToMove() == Color::X ? GameResult::O_WIN : GameResult::X_WIN;
+    // terrible
+    if (board.isDrawn())
+        return GameResult::DRAW;
+    return GameResult::DRAW;
+}
+
+int main()
+{
+    std::mt19937 rng(10483);
+    int counts[3] = {};
+    for (int i = 0; i < 1000000; i++)
+        counts[static_cast<int>(playRandomGame(rng))]++;
+    std::cout << counts[0] << ' ' << counts[1] << ' ' << counts[2] << std::endl;
+    // board.setToFen("xox x x  xo x x   ox  o          o x  xox x      o    ooo    x     o    o   o x O");
     return 0;
 }
