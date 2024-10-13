@@ -9,8 +9,8 @@ void genSubBoardMoves(const Board& board, MoveList& moveList, int subBoard)
     Bitboard free = ~occupied & IN_BOARD;
     while (free.any())
     {
-        uint32_t sq = free.poplsb();
-        moveList.push_back({static_cast<uint8_t>(subBoard), static_cast<uint8_t>(sq)});
+        uint32_t subSq = free.poplsb();
+        moveList.push_back(Move{Square(static_cast<uint8_t>(subBoard), static_cast<uint8_t>(subSq))});
     }
 }
 

@@ -14,38 +14,59 @@ Board::Board()
 void Board::setToFen(std::string_view fen)
 {
     m_BoardStates.clear();
-    if (fen == "")
+    m_BoardStates.push_back({});
+    // terrible variable name
+    int currSq = 72;
+    int i = 0;
+    for (;;)
     {
-        BoardState rootState = {};
-        rootState.subBoardIdx = -1;
-        m_BoardStates.push_back(rootState);
-        return;
+        char c = fen[i++];
+        if (c == ' ')
+            break;
+        Square sq(currSq);
+
+        switch (c)
+        {
+            case 'x':
+            {
+                state().subBoards[sq.subBoard()][static_cast<int>(Color::X)] |= Bitboard::fromSquare(sq.subSquare());
+                currSq++;
+                break;
+            }
+            case 'o':
+            {
+                state().subBoards[sq.subBoard()][static_cast<int>(Color::O)] |= Bitboard::fromSquare(sq.subSquare());
+                currSq++;
+                break;
+            }
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                currSq += c - '0';
+                break;
+            case '/':
+                currSq -= 18;
+                break;
+        }
     }
+
+    m_SideToMove = fen[i] == 'X' ? Color::X : Color::O;
+    i += 2;
+    while (isdigit(fen[i]))
+        i++;
+    i++;
+    if (fen[i] == '0')
+        state().subBoardIdx = -1;
     else
     {
-        m_BoardStates.push_back({});
-    }
-    // terrible variable name
-    constexpr std::array<int, 9> ORDER = {6, 7, 8, 3, 4, 5, 0, 1, 2};
-    int i = 0;
-    int currSubBoard = -1;
-    for (int subBoard : ORDER)
-    {
-        for (int square : ORDER)
-        {
-            char c = fen[i++];
-            if (std::isupper(c))
-                currSubBoard = subBoard;
-            c = std::tolower(c);
-            if (c == 'x')
-            {
-                state().subBoards[subBoard][static_cast<int>(Color::X)] |= Bitboard::fromSquare(square);
-            }
-            else if (c == 'o')
-            {
-                state().subBoards[subBoard][static_cast<int>(Color::O)] |= Bitboard::fromSquare(square);
-            }
-        }
+        int sq = 9 * (fen[i + 1] - '1') + (fen[i] - 'a');
+        state().subBoardIdx = Square(sq).subSquare();
     }
 
     for (int i = 0; i < 9; i++)
@@ -59,23 +80,21 @@ void Board::setToFen(std::string_view fen)
         if ((state().subBoards[i][0] | state().subBoards[i][1]) == IN_BOARD)
             state().drawn |= Bitboard::fromSquare(i);
     }
-
-    state().subBoardIdx = currSubBoard;
 }
 
 void Board::makeMove(Move move)
 {
     m_BoardStates.push_back(state());
     auto& newState = state();
-    auto& subBoard = newState.subBoards[move.subBoard][static_cast<int>(m_SideToMove)];
-    subBoard |= Bitboard::fromSquare(move.square);
-    
-    if (attacks::boardIsWon(subBoard))
-        newState.won[static_cast<int>(m_SideToMove)] |= Bitboard::fromSquare(move.subBoard);
-    if ((newState.subBoards[move.subBoard][0] | newState.subBoards[move.subBoard][1]) == IN_BOARD)
-        newState.drawn |= Bitboard::fromSquare(move.subBoard);
+    auto& subBoard = newState.subBoards[move.to.subBoard()][static_cast<int>(m_SideToMove)];
+    subBoard |= Bitboard::fromSquare(move.to.subSquare());
 
-    newState.subBoardIdx = move.square;
+    if (attacks::boardIsWon(subBoard))
+        newState.won[static_cast<int>(m_SideToMove)] |= Bitboard::fromSquare(move.to.subBoard());
+    if ((newState.subBoards[move.to.subBoard()][0] | newState.subBoards[move.to.subBoard()][1]) == IN_BOARD)
+        newState.drawn |= Bitboard::fromSquare(move.to.subBoard());
+
+    newState.subBoardIdx = move.to.subSquare();
 
     m_SideToMove = ~m_SideToMove;
 }
