@@ -6,8 +6,8 @@
 
 std::string moveToStr(Move move)
 {
-    int x = 3 * (move.subBoard % 3) + move.square % 3;
-    int y = 3 * (move.subBoard / 3) + move.square / 3;
+    int x = move.to.x();
+    int y = move.to.y();
     std::string result;
     result += static_cast<char>(x + 'a');
     result += static_cast<char>(y + '1');
@@ -78,9 +78,12 @@ int main()
 {
     std::mt19937 rng(10483);
     int counts[3] = {};
-    for (int i = 0; i < 1000000; i++)
+    for (int i = 0; i < 100/*0000*/; i++)
         counts[static_cast<int>(playRandomGame(rng))]++;
     std::cout << counts[0] << ' ' << counts[1] << ' ' << counts[2] << std::endl;
-    // board.setToFen("xox x x  xo x x   ox  o          o x  xox x      o    ooo    x     o    o   o x O");
+    Board board;
+    //board.setToFen("xox x x  xo x x   ox  o          o x  xox x      o    ooo    x     o    o   o x O");
+    std::cout << board.stringRep() << std::endl;
+    perft(board, 1);
     return 0;
 }

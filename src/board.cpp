@@ -67,15 +67,15 @@ void Board::makeMove(Move move)
 {
     m_BoardStates.push_back(state());
     auto& newState = state();
-    auto& subBoard = newState.subBoards[move.subBoard][static_cast<int>(m_SideToMove)];
-    subBoard |= Bitboard::fromSquare(move.square);
-    
-    if (attacks::boardIsWon(subBoard))
-        newState.won[static_cast<int>(m_SideToMove)] |= Bitboard::fromSquare(move.subBoard);
-    if ((newState.subBoards[move.subBoard][0] | newState.subBoards[move.subBoard][1]) == IN_BOARD)
-        newState.drawn |= Bitboard::fromSquare(move.subBoard);
+    auto& subBoard = newState.subBoards[move.to.subBoard()][static_cast<int>(m_SideToMove)];
+    subBoard |= Bitboard::fromSquare(move.to.subSquare());
 
-    newState.subBoardIdx = move.square;
+    if (attacks::boardIsWon(subBoard))
+        newState.won[static_cast<int>(m_SideToMove)] |= Bitboard::fromSquare(move.to.subBoard());
+    if ((newState.subBoards[move.to.subBoard()][0] | newState.subBoards[move.to.subBoard()][1]) == IN_BOARD)
+        newState.drawn |= Bitboard::fromSquare(move.to.subBoard());
+
+    newState.subBoardIdx = move.to.subSquare();
 
     m_SideToMove = ~m_SideToMove;
 }
