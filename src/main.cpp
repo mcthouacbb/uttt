@@ -123,6 +123,33 @@ std::pair<std::string, std::array<int, 9>> perftTests[] = {
     {"oox2xxox/xx3xoxo/x1o2xo1x/1o1ooox1o/1x2xooox/ox1x2ox1/x2o1oo1x/1ox2xx2/ox3o1o1 O 0 h8", {1, 0, 0, 0, 0, 0, 0, 0}}
 };
 
+void genOpeningsImpl(Board& board, int depth)
+{
+    if (depth == 0)
+    {
+        std::cout << board.fenStr() << std::endl;
+        return;
+    }
+    MoveList moves;
+
+    if (board.isLost() || board.isDrawn())
+        return;
+
+    genMoves(board, moves);
+    for (Move move : moves)
+    {
+        board.makeMove(move);
+        genOpeningsImpl(board, depth - 1);
+        board.unmakeMove(move);
+    }
+}
+
+void genOpenings(int depth)
+{
+    Board board;
+    genOpeningsImpl(board, depth);
+}
+
 void runPerftSuite()
 {
     Board board;
@@ -345,6 +372,12 @@ int main()
         else if (tok == "d")
         {
             std::cout << currBoard.stringRep() << std::endl;
+        }
+        else if (tok == "genopenings")
+        {
+            int ply;
+            ss >> ply;
+            genOpenings(ply);
         }
         else
         {

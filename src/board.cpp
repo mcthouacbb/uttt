@@ -67,6 +67,7 @@ void Board::setToFen(std::string_view fen)
     {
         int sq = 9 * (fen[i + 1] - '1') + (fen[i] - 'a');
         state().subBoardIdx = Square(sq).subSquare();
+        state().prevSquare = Square(sq);
     }
 
     for (int i = 0; i < 9; i++)
@@ -82,6 +83,46 @@ void Board::setToFen(std::string_view fen)
     }
 }
 
+std::string Board::fenStr() const
+{
+    std::string fen;
+    for (int j = 72; j >= 0; j -= 9)
+    {
+        int lastFile = -1;
+        for (int i = j; i < j + 9; i++)
+        {
+            Piece piece = pieceAt(Square(i).subBoard(), Square(i).subSquare());
+            if (piece != Piece::NONE)
+            {
+                int diff = i - j - lastFile;
+                if (diff > 1)
+                    fen += static_cast<char>((diff - 1) + '0');
+                fen += piece == Piece::X ? 'x' : 'o';
+                lastFile = i - j;
+            }
+        }
+        int diff = 9 - lastFile;
+        if (diff > 1)
+            fen += static_cast<char>((diff - 1) + '0');
+        if (j != 0)
+            fen += '/';
+    }
+
+    fen += ' ';
+
+    fen += sideToMove() == Color::X ? 'X' : 'O';
+
+    fen += ' ';
+    fen += '0';
+    fen += ' ';
+
+    if (state().subBoardIdx == -1)
+        fen += "0000";
+    else
+        fen += state().prevSquare.toString();
+    return fen;
+}
+
 void Board::makeMove(Move move)
 {
     m_BoardStates.push_back(state());
@@ -95,6 +136,7 @@ void Board::makeMove(Move move)
         newState.drawn |= Bitboard::fromSquare(move.to.subBoard());
 
     newState.subBoardIdx = move.to.subSquare();
+    newState.prevSquare = move.to;
 
     m_SideToMove = ~m_SideToMove;
 }

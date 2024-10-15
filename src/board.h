@@ -12,6 +12,8 @@ struct BoardState
     Bitboard drawn;
 
     int subBoardIdx;
+
+    Square prevSquare;
 };
 
 class Board
@@ -25,11 +27,13 @@ public:
     void unmakeMove(Move move);
 
     std::string stringRep() const;
+    std::string fenStr() const;
 
     Bitboard subBoard(Color color, int subBoardIdx) const;
     Bitboard wonBoards(Color color) const;
     Bitboard drawnBoards() const;
     Bitboard completedBoards() const;
+    // TODO make this use the actual square type
     Piece pieceAt(int subBoardIdx, int square) const;
 
     int subBoardIdx() const;
