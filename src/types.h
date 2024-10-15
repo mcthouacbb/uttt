@@ -88,3 +88,5 @@ constexpr Color operator~(const Color& color)
 {
     return static_cast<Color>(static_cast<int>(color) ^ 1);
 }
+
+constexpr int SCORE_WIN = 32700;

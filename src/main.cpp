@@ -5,6 +5,7 @@
 
 #include "board.h"
 #include "movegen.h"
+#include "search.h"
 
 std::string moveToStr(Move move)
 {
@@ -158,6 +159,8 @@ int main()
     Board currBoard;
     Color player1 = Color::X;
 
+    Search search;
+
     while (std::getline(std::cin, command))
     {
         std::istringstream ss(command);
@@ -265,7 +268,79 @@ int main()
         }
         else if (tok == "go")
         {
-            std::cout << "bestmove " << moveToStr(randomMove(currBoard, rng)) << std::endl;
+            SearchLimits limits = {};
+            limits.maxDepth = 127;
+            while (ss.tellg() != -1)
+            {
+                ss >> tok;
+                if (tok == "p1time")
+                {
+                    if (currBoard.sideToMove() == player1)
+                    {
+                        int time;
+                        ss >> time;
+                        limits.clock.time = Duration(time);
+                        limits.clock.enabled = true;
+                    }
+                }
+                else if (tok == "p2time")
+                {
+                    if (currBoard.sideToMove() != player1)
+                    {
+                        int time;
+                        ss >> time;
+                        limits.clock.time = Duration(time);
+                        limits.clock.enabled = true;
+                    }
+                }
+                else if (tok == "p1inc")
+                {
+                    if (currBoard.sideToMove() == player1)
+                    {
+                        int time;
+                        ss >> time;
+                        limits.clock.inc = Duration(time);
+                        limits.clock.enabled = true;
+                    }
+                }
+                else if (tok == "p2inc")
+                {
+                    if (currBoard.sideToMove() != player1)
+                    {
+                        int time;
+                        ss >> time;
+                        limits.clock.inc = Duration(time);
+                        limits.clock.enabled = true;
+                    }
+                }
+                // L movestogo
+                else if (tok == "depth")
+                {
+                    // todo
+                }
+                else if (tok == "nodes")
+                {
+                    // todo
+                }
+                else if (tok == "mate")
+                {
+                    // todo
+                }
+                else if (tok == "movetime")
+                {
+                    int time;
+                    ss >> time;
+                    limits.maxTime = Duration(time);
+                }
+                else if (tok == "infinite")
+                {
+                    // nothing to be done
+                }
+            }
+
+            search.setBoard(currBoard);
+            auto result = search.runSearch(limits);
+            std::cout << "bestmove " << result.bestMove.to.toString() << std::endl;
         }
         else if (tok == "d")
         {
