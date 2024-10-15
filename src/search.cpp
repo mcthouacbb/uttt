@@ -1,5 +1,6 @@
 #include "search.h"
 #include "movegen.h"
+#include "evaluate.h"
 
 Search::Search()
 {
@@ -49,18 +50,12 @@ SearchResult Search::runSearch(const SearchLimits& limits, bool report)
     return SearchResult{score, bestMove};
 }
 
-int evaluate(const Board& board)
-{
-    int eval = board.wonBoards(Color::X).popcount() - board.wonBoards(Color::O).popcount();
-    return board.sideToMove() == Color::X ? eval : -eval;
-}
-
 int Search::search(int depth, int ply)
 {
     // TODO: add better evaluation function
     // TODO: move evaluation into it's own file
     if (depth == 0)
-        return evaluate(m_Board);
+        return eval::evaluate(m_Board);
     if (m_Board.isDrawn())
         return 0;
     if (m_Board.isLost())
