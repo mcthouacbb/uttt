@@ -8,6 +8,7 @@ Board::Board()
     m_BoardStates.reserve(128);
     BoardState rootState = {};
     rootState.subBoardIdx = -1;
+    rootState.key.updateCurrSubBoard(rootState.subBoardIdx);
     m_BoardStates.push_back(rootState);
 }
 
@@ -81,6 +82,8 @@ void Board::setToFen(std::string_view fen)
         if ((subBoard(Color::X, i) | subBoard(Color::O, i)) == IN_BOARD)
             state().drawn |= Bitboard::fromSquare(i);
     }
+
+    state().key.updateCurrSubBoard(state().subBoardIdx);
 }
 
 std::string Board::fenStr() const
@@ -128,6 +131,7 @@ void Board::makeMove(Move move)
     m_BoardStates.push_back(state());
     auto& newState = state();
     newState.addPiece(m_SideToMove, move.to);
+    newState.key.updateCurrSubBoard(newState.subBoardIdx);
 
     if (attacks::boardIsWon(subBoard(m_SideToMove, move.to.subBoard())))
         newState.won[static_cast<int>(m_SideToMove)] |= Bitboard::fromSquare(move.to.subBoard());
@@ -136,6 +140,7 @@ void Board::makeMove(Move move)
 
     newState.subBoardIdx = move.to.subSquare();
     newState.prevSquare = move.to;
+    newState.key.updateCurrSubBoard(newState.subBoardIdx);
 
     newState.key.flipSideToMove();
 

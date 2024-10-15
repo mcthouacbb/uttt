@@ -42,6 +42,7 @@ public:
     Bitboard drawnBoards() const;
     Bitboard completedBoards() const;
     Piece pieceAt(Square sq) const;
+    ZKey key() const;
 
     int subBoardIdx() const;
     Color sideToMove() const;
@@ -87,6 +88,11 @@ inline Piece Board::pieceAt(Square sq) const
     if ((subBoardO & Bitboard::fromSquare(sq.subSquare())).any())
         return Piece::O;
     return Piece::NONE;
+}
+
+inline ZKey Board::key() const
+{
+    return state().key;
 }
 
 inline int Board::subBoardIdx() const
