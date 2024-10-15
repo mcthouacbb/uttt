@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 struct Square
 {
@@ -47,6 +48,17 @@ public:
     {
         return 3 * (m_SubBoard / 3) + m_SubSquare / 3;
     }
+
+    std::string toString()
+    {
+        std::string result;
+        result += static_cast<char>(x() + 'a');
+        result += static_cast<char>(y() + '1');
+        return result;
+    }
+
+    constexpr bool operator==(const Square& other) const noexcept = default;
+    constexpr bool operator!=(const Square& other) const noexcept = default;
 private:
     uint8_t m_SubBoard, m_SubSquare;
 };
@@ -54,6 +66,9 @@ private:
 struct Move
 {
     Square to;
+
+    constexpr bool operator==(const Move& other) const noexcept = default;
+    constexpr bool operator!=(const Move& other) const noexcept = default;
 };
 
 enum class Piece

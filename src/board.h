@@ -10,7 +10,7 @@ struct BoardState
     Bitboard subBoards[9][2];
     Bitboard won[2];
     Bitboard drawn;
-    
+
     int subBoardIdx;
 };
 
@@ -35,7 +35,7 @@ public:
     int subBoardIdx() const;
     Color sideToMove() const;
 
-    bool isWon() const;
+    bool isLost() const;
     bool isDrawn() const;
 private:
     BoardState& state();
@@ -98,7 +98,7 @@ inline const BoardState& Board::state() const
     return m_BoardStates.back();
 }
 
-inline bool Board::isWon() const
+inline bool Board::isLost() const
 {
     // only last player to move could have won the game
     return attacks::boardIsWon(wonBoards(~m_SideToMove));
