@@ -3,7 +3,7 @@
 
 using MoveList = StaticVector<Move, 81>;
 
-void genSubBoardMoves(const Board& board, MoveList& moveList, int subBoard)
+inline void genSubBoardMoves(const Board& board, MoveList& moveList, int subBoard)
 {
     Bitboard occupied = board.subBoard(Color::X, subBoard) | board.subBoard(Color::O, subBoard);
     Bitboard free = ~occupied & IN_BOARD;
@@ -14,7 +14,7 @@ void genSubBoardMoves(const Board& board, MoveList& moveList, int subBoard)
     }
 }
 
-void genMoves(const Board& board, MoveList& moveList)
+inline void genMoves(const Board& board, MoveList& moveList)
 {
     if (board.subBoardIdx() == -1 ||
         (board.completedBoards() & Bitboard::fromSquare(board.subBoardIdx())).any())

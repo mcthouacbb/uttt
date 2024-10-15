@@ -39,17 +39,17 @@ public:
         return m_SubSquare;
     }
 
-    uint8_t x()
+    uint8_t x() const
     {
         return 3 * (m_SubBoard % 3) + m_SubSquare % 3;
     }
 
-    uint8_t y()
+    uint8_t y() const
     {
         return 3 * (m_SubBoard / 3) + m_SubSquare / 3;
     }
 
-    std::string toString()
+    std::string toString() const
     {
         std::string result;
         result += static_cast<char>(x() + 'a');
@@ -88,3 +88,5 @@ constexpr Color operator~(const Color& color)
 {
     return static_cast<Color>(static_cast<int>(color) ^ 1);
 }
+
+constexpr int SCORE_WIN = 32700;

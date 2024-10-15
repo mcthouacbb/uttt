@@ -5,6 +5,7 @@
 
 #include "board.h"
 #include "movegen.h"
+#include "search.h"
 
 std::string moveToStr(Move move)
 {
@@ -122,6 +123,33 @@ std::pair<std::string, std::array<int, 9>> perftTests[] = {
     {"oox2xxox/xx3xoxo/x1o2xo1x/1o1ooox1o/1x2xooox/ox1x2ox1/x2o1oo1x/1ox2xx2/ox3o1o1 O 0 h8", {1, 0, 0, 0, 0, 0, 0, 0}}
 };
 
+void genOpeningsImpl(Board& board, int depth)
+{
+    if (depth == 0)
+    {
+        std::cout << board.fenStr() << std::endl;
+        return;
+    }
+    MoveList moves;
+
+    if (board.isLost() || board.isDrawn())
+        return;
+
+    genMoves(board, moves);
+    for (Move move : moves)
+    {
+        board.makeMove(move);
+        genOpeningsImpl(board, depth - 1);
+        board.unmakeMove(move);
+    }
+}
+
+void genOpenings(int depth)
+{
+    Board board;
+    genOpeningsImpl(board, depth);
+}
+
 void runPerftSuite()
 {
     Board board;
@@ -157,6 +185,8 @@ int main()
     std::string command;
     Board currBoard;
     Color player1 = Color::X;
+
+    Search search;
 
     while (std::getline(std::cin, command))
     {
@@ -265,11 +295,89 @@ int main()
         }
         else if (tok == "go")
         {
-            std::cout << "bestmove " << moveToStr(randomMove(currBoard, rng)) << std::endl;
+            SearchLimits limits = {};
+            limits.maxDepth = 127;
+            while (ss.tellg() != -1)
+            {
+                ss >> tok;
+                if (tok == "p1time")
+                {
+                    if (currBoard.sideToMove() == player1)
+                    {
+                        int time;
+                        ss >> time;
+                        limits.clock.time = Duration(time);
+                        limits.clock.enabled = true;
+                    }
+                }
+                else if (tok == "p2time")
+                {
+                    if (currBoard.sideToMove() != player1)
+                    {
+                        int time;
+                        ss >> time;
+                        limits.clock.time = Duration(time);
+                        limits.clock.enabled = true;
+                    }
+                }
+                else if (tok == "p1inc")
+                {
+                    if (currBoard.sideToMove() == player1)
+                    {
+                        int time;
+                        ss >> time;
+                        limits.clock.inc = Duration(time);
+                        limits.clock.enabled = true;
+                    }
+                }
+                else if (tok == "p2inc")
+                {
+                    if (currBoard.sideToMove() != player1)
+                    {
+                        int time;
+                        ss >> time;
+                        limits.clock.inc = Duration(time);
+                        limits.clock.enabled = true;
+                    }
+                }
+                // L movestogo
+                else if (tok == "depth")
+                {
+                    // todo
+                }
+                else if (tok == "nodes")
+                {
+                    // todo
+                }
+                else if (tok == "mate")
+                {
+                    // todo
+                }
+                else if (tok == "movetime")
+                {
+                    int time;
+                    ss >> time;
+                    limits.maxTime = Duration(time);
+                }
+                else if (tok == "infinite")
+                {
+                    // nothing to be done
+                }
+            }
+
+            search.setBoard(currBoard);
+            auto result = search.runSearch(limits);
+            std::cout << "bestmove " << result.bestMove.to.toString() << std::endl;
         }
         else if (tok == "d")
         {
             std::cout << currBoard.stringRep() << std::endl;
+        }
+        else if (tok == "genopenings")
+        {
+            int ply;
+            ss >> ply;
+            genOpenings(ply);
         }
         else
         {
