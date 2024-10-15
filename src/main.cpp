@@ -8,12 +8,19 @@
 
 std::string moveToStr(Move move)
 {
-    int x = move.to.x();
-    int y = move.to.y();
-    std::string result;
-    result += static_cast<char>(x + 'a');
-    result += static_cast<char>(y + '1');
-    return result;
+    return move.to.toString();
+}
+
+Move findMoveFromStr(const Board& board, std::string_view moveStr)
+{
+    int sq = 9 * (moveStr[1] - '1') + moveStr[0] - 'a';
+    MoveList moves;
+    genMoves(board, moves);
+    auto move = Move{Square(sq)};
+    auto it = std::find(moves.begin(), moves.end(), move);
+    if (it == moves.end())
+        std::cout << "info string illegal move " << moveStr << std::endl;
+    return move;
 }
 
 template<bool root = true>
@@ -23,7 +30,7 @@ uint64_t perft(Board& board, int depth)
         return 1;
     MoveList moves;
     uint64_t nodes = 0;
-    if (board.isWon() || board.isDrawn())
+    if (board.isLost() || board.isDrawn())
         return 0;
     genMoves(board, moves);
     for (Move move : moves)
@@ -46,6 +53,15 @@ enum class GameResult
     X_WIN, O_WIN, DRAW
 };
 
+Move randomMove(const Board& board, std::mt19937& rng)
+{
+    MoveList moves;
+    genMoves(board, moves);
+    std::uniform_int_distribution<int> dist(0, moves.size() - 1);
+    int idx = dist(rng);
+    return moves[idx];
+}
+
 GameResult playRandomGame(std::mt19937& rng)
 {
     Board board;
@@ -66,11 +82,11 @@ GameResult playRandomGame(std::mt19937& rng)
 
         board.makeMove(moves[idx]);
 
-        if (board.isWon() || board.isDrawn())
+        if (board.isLost() || board.isDrawn())
             break;
     }
     // std::cout << board.stringRep() << std::endl;
-    if (board.isWon())
+    if (board.isLost())
         return board.sideToMove() == Color::X ? GameResult::O_WIN : GameResult::X_WIN;
     // terrible
     if (board.isDrawn())
@@ -106,7 +122,7 @@ std::pair<std::string, std::array<int, 9>> perftTests[] = {
     {"oox2xxox/xx3xoxo/x1o2xo1x/1o1ooox1o/1x2xooox/ox1x2ox1/x2o1oo1x/1ox2xx2/ox3o1o1 O 0 h8", {1, 0, 0, 0, 0, 0, 0, 0}}
 };
 
-int main()
+void runPerftSuite()
 {
     Board board;
     uint64_t totalNodes = 0;
@@ -131,5 +147,134 @@ int main()
     std::cout << "Total nodes: " << totalNodes << std::endl;
     std::cout << "Total time: " << time << std::endl;
     std::cout << "NPS: " << std::fixed << totalNodes / time << std::endl;
+}
+
+int main()
+{
+    std::random_device rd;
+    std::mt19937 rng(rd());
+    //runPerftSuite();
+    std::string command;
+    Board currBoard;
+    Color player1 = Color::X;
+
+    while (std::getline(std::cin, command))
+    {
+        std::istringstream ss(command);
+        std::string tok;
+        ss >> tok;
+        if (tok == "ugi")
+        {
+            std::cout << "id name utttUnnamed" << std::endl;
+            std::cout << "id author mcthoaucbb" << std::endl;
+            std::cout << "ugiok" << std::endl;
+        }
+        else if (tok == "isready")
+        {
+            std::cout << "readyok" << std::endl;
+        }
+        else if (tok == "uginewgame")
+        {
+            currBoard.setToFen("9/9/9/9/9/9/9/9/9 X 0 0000");
+            player1 = currBoard.sideToMove();
+        }
+        else if (tok == "position")
+        {
+            ss >> tok;
+            if (tok == "startpos")
+            {
+                currBoard.setToFen("9/9/9/9/9/9/9/9/9 X 0 0000");
+                player1 = currBoard.sideToMove();
+                if (ss)
+                {
+                    ss >> tok;
+                    if (tok == "moves")
+                    {
+                        while (ss.tellg() != -1)
+                        {
+                            ss >> tok;
+                            Move move = findMoveFromStr(currBoard, tok);
+                            currBoard.makeMove(move);
+                        }
+                    }
+                }
+            }
+            else if (tok == "fen")
+            {
+                std::string fen;
+                ss >> fen;
+                while (ss.tellg() != -1)
+                {
+                    ss >> tok;
+                    if (tok == "moves")
+                        break;
+                    fen += ' ' + tok;
+                }
+                currBoard.setToFen(fen);
+                player1 = currBoard.sideToMove();
+                if (tok == "moves")
+                {
+                    while (ss.tellg() != -1)
+                    {
+                        ss >> tok;
+                        Move move = findMoveFromStr(currBoard, tok);
+                        currBoard.makeMove(move);
+                    }
+                }
+            }
+            else
+            {
+                std::cout << "info string invalid command" << std::endl;
+            }
+        }
+        else if (tok == "query")
+        {
+            ss >> tok;
+            if (tok == "gameover")
+            {
+                if (currBoard.isLost() || currBoard.isDrawn())
+                    std::cout << "response true" << std::endl;
+                else
+                    std::cout << "response false" << std::endl;
+            }
+            else if (tok == "p1turn")
+            {
+                if (currBoard.sideToMove() == player1)
+                    std::cout << "response true" << std::endl;
+                else
+                    std::cout << "response false" << std::endl;
+            }
+            else if (tok == "result")
+            {
+                if (currBoard.isDrawn())
+                    std::cout << "response draw" << std::endl;
+                else if (currBoard.isLost())
+                {
+                    if (currBoard.sideToMove() == player1)
+                        std::cout << "response p2win" << std::endl;
+                    else
+                        std::cout << "response p1win" << std::endl;
+                }
+                else
+                    std::cout << "response none" << std::endl;
+            }
+            else
+            {
+                std::cout << "info string invalid command" << std::endl;
+            }
+        }
+        else if (tok == "go")
+        {
+            std::cout << "bestmove " << moveToStr(randomMove(currBoard, rng)) << std::endl;
+        }
+        else if (tok == "d")
+        {
+            std::cout << currBoard.stringRep() << std::endl;
+        }
+        else
+        {
+            std::cout << "info string invalid command" << std::endl;
+        }
+    }
     return 0;
 }
