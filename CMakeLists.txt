@@ -17,8 +17,10 @@ set(SRCS
     "src/board.h"
     "src/main.cpp"
     "src/movegen.h"
-    "src/search.h"
     "src/search.cpp"
+    "src/search.h"
+    "src/time_man.cpp"
+    "src/time_man.h"
     "src/types.h"
 
     "src/util/static_vector.h"

@@ -91,7 +91,7 @@ std::string Board::fenStr() const
         int lastFile = -1;
         for (int i = j; i < j + 9; i++)
         {
-            Piece piece = pieceAt(Square(i).subBoard(), Square(i).subSquare());
+            Piece piece = pieceAt(Square(i));
             if (piece != Piece::NONE)
             {
                 int diff = i - j - lastFile;
@@ -156,7 +156,7 @@ std::string Board::stringRep() const
                 // columns
                 for (int k = 0; k < 3; k++)
                 {
-                    Piece pce = pieceAt(s, (2 - i) * 3 + k);
+                    Piece pce = pieceAt(Square(s, (2 - i) * 3 + k));
                     if (pce == Piece::X)
                         str += "X";
                     else if (pce == Piece::O)

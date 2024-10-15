@@ -33,8 +33,7 @@ public:
     Bitboard wonBoards(Color color) const;
     Bitboard drawnBoards() const;
     Bitboard completedBoards() const;
-    // TODO make this use the actual square type
-    Piece pieceAt(int subBoardIdx, int square) const;
+    Piece pieceAt(Square sq) const;
 
     int subBoardIdx() const;
     Color sideToMove() const;
@@ -70,14 +69,14 @@ inline Bitboard Board::completedBoards() const
     return state().won[0] | state().won[1] | state().drawn;
 }
 
-inline Piece Board::pieceAt(int subBoardIdx, int square) const
+inline Piece Board::pieceAt(Square sq) const
 {
-    Bitboard subBoardX = subBoard(Color::X, subBoardIdx);
-    Bitboard subBoardO = subBoard(Color::O, subBoardIdx);
+    Bitboard subBoardX = subBoard(Color::X, sq.subBoard());
+    Bitboard subBoardO = subBoard(Color::O, sq.subBoard());
 
-    if ((subBoardX & Bitboard::fromSquare(square)).any())
+    if ((subBoardX & Bitboard::fromSquare(sq.subSquare())).any())
         return Piece::X;
-    if ((subBoardO & Bitboard::fromSquare(square)).any())
+    if ((subBoardO & Bitboard::fromSquare(sq.subSquare())).any())
         return Piece::O;
     return Piece::NONE;
 }
