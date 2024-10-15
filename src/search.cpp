@@ -11,10 +11,16 @@ void Search::setBoard(const Board& board)
     m_Board = board;
 }
 
-SearchResult Search::runSearch(const SearchLimits& limits)
+uint64_t Search::runBenchSearch(const SearchLimits& limits)
+{
+    runSearch(limits, false);
+    return m_Nodes;
+}
+
+SearchResult Search::runSearch(const SearchLimits& limits, bool report)
 {
     m_ShouldStop = false;
-    nodes = 0;
+    m_Nodes = 0;
     m_TimeMan.setLimits(limits);
     m_TimeMan.startSearch();
 
@@ -27,15 +33,18 @@ SearchResult Search::runSearch(const SearchLimits& limits)
             break;
         score = iterScore;
         bestMove = m_RootBestMove;
-        int64_t time = m_TimeMan.elapsed().count();
-        std::cout
-            << "info depth " << depth
-            << " score cp " << score
-            << " nodes " << nodes
-            << " time " << time
-            << " nps " << nodes * 1000 / std::max(1LL, time)
-            << " pv " << bestMove.to.toString()
-            << std::endl;
+        if (report)
+        {
+            int64_t time = m_TimeMan.elapsed().count();
+            std::cout
+                << "info depth " << depth
+                << " score cp " << score
+                << " nodes " << m_Nodes
+                << " time " << time
+                << " nps " << m_Nodes * 1000 / std::max(1LL, time)
+                << " pv " << bestMove.to.toString()
+                << std::endl;
+        }
     }
     return SearchResult{score, bestMove};
 }
@@ -57,7 +66,7 @@ int Search::search(int depth, int ply)
     if (m_Board.isLost())
         return -SCORE_WIN + ply;
 
-    if (nodes % 512 == 0 && m_TimeMan.shouldStop())
+    if (m_Nodes % 512 == 0 && m_TimeMan.shouldStop())
     {
         m_ShouldStop = true;
         return 0;
@@ -72,7 +81,7 @@ int Search::search(int depth, int ply)
 
     for (Move move : moveList)
     {
-        nodes++;
+        m_Nodes++;
         m_Board.makeMove(move);
         int score = -search(depth - 1, ply + 1);
         m_Board.unmakeMove(move);

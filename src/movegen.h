@@ -1,3 +1,5 @@
+#pragma once
+
 #include "util/static_vector.h"
 #include "board.h"
 

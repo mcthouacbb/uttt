@@ -1,3 +1,5 @@
+#pragma once
+
 #include "board.h"
 #include "time_man.h"
 
@@ -13,7 +15,8 @@ public:
     Search();
 
     void setBoard(const Board& board);
-    SearchResult runSearch(const SearchLimits& limits);
+    SearchResult runSearch(const SearchLimits& limits, bool report = true);
+    uint64_t runBenchSearch(const SearchLimits& limits);
 private:
     int search(int depth, int ply);
 
@@ -23,5 +26,5 @@ private:
 
     bool m_ShouldStop;
 
-    uint64_t nodes;
+    uint64_t m_Nodes;
 };
