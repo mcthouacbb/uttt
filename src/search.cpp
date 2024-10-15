@@ -3,6 +3,7 @@
 #include "evaluate.h"
 
 Search::Search()
+    : m_TT(64)
 {
     m_ShouldStop = false;
 }
@@ -52,8 +53,6 @@ SearchResult Search::runSearch(const SearchLimits& limits, bool report)
 
 int Search::search(int alpha, int beta, int depth, int ply)
 {
-    // TODO: add better evaluation function
-    // TODO: move evaluation into it's own file
     if (depth == 0)
         return eval::evaluate(m_Board);
     if (m_Board.isDrawn())
@@ -69,17 +68,30 @@ int Search::search(int alpha, int beta, int depth, int ply)
 
     bool root = ply == 0;
 
+    TTData ttData = {};
+    bool ttHit = m_TT.probe(m_Board.key(), ttData);
+
+    // TODO: actual move picker
     MoveList moveList;
     genMoves(m_Board, moveList);
 
+    // swap tt move to front for now
+    if (ttHit)
+    {
+        auto it = std::find(moveList.begin(), moveList.end(), ttData.move);
+        if (it != moveList.end())
+            std::iter_swap(it, moveList.begin());
+    }
+
     int bestScore = -SCORE_WIN;
+    Move bestMove = NULL_MOVE;
 
     for (Move move : moveList)
     {
         m_Nodes++;
         m_Board.makeMove(move);
         int score = -search(-beta, -alpha, depth - 1, ply + 1);
-        m_Board.unmakeMove(move);
+        m_Board.unmakeMove();
 
         if (m_ShouldStop)
             return 0;
@@ -90,6 +102,7 @@ int Search::search(int alpha, int beta, int depth, int ply)
             if (score > alpha)
             {
                 alpha = score;
+                bestMove = move;
                 if (root)
                     m_RootBestMove = move;
             }
@@ -98,6 +111,8 @@ int Search::search(int alpha, int beta, int depth, int ply)
                 break;
         }
     }
+
+    m_TT.store(m_Board.key(), bestMove);
 
     return bestScore;
 }

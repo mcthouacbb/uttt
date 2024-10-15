@@ -39,7 +39,7 @@ uint64_t perft(Board& board, int depth)
     {
         board.makeMove(move);
         uint64_t subNodes = perft<false>(board, depth - 1);
-        board.unmakeMove(move);
+        board.unmakeMove();
         if constexpr (root)
             std::cout << moveToStr(move) << ": " << subNodes << std::endl;
         nodes += subNodes;
@@ -141,7 +141,7 @@ void genOpeningsImpl(Board& board, int depth)
     {
         board.makeMove(move);
         genOpeningsImpl(board, depth - 1);
-        board.unmakeMove(move);
+        board.unmakeMove();
     }
 }
 
@@ -208,6 +208,7 @@ int main()
         {
             currBoard.setToFen("9/9/9/9/9/9/9/9/9 X 0 0000");
             player1 = currBoard.sideToMove();
+            search.newGame();
         }
         else if (tok == "position")
         {
@@ -372,7 +373,9 @@ int main()
         }
         else if (tok == "d")
         {
-            std::cout << currBoard.stringRep() << std::endl;
+            std::cout << currBoard.stringRep();
+            std::cout << "Side to move: " << (currBoard.sideToMove() == Color::X ? 'X' : 'O') << std::endl;
+            std::cout << "Zobrist hash: " << std::hex << (currBoard.key().value) << std::endl;
         }
         else if (tok == "genopenings")
         {
