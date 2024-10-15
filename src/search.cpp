@@ -52,8 +52,6 @@ SearchResult Search::runSearch(const SearchLimits& limits, bool report)
 
 int Search::search(int alpha, int beta, int depth, int ply)
 {
-    // TODO: add better evaluation function
-    // TODO: move evaluation into it's own file
     if (depth == 0)
         return eval::evaluate(m_Board);
     if (m_Board.isDrawn())
@@ -79,7 +77,7 @@ int Search::search(int alpha, int beta, int depth, int ply)
         m_Nodes++;
         m_Board.makeMove(move);
         int score = -search(-beta, -alpha, depth - 1, ply + 1);
-        m_Board.unmakeMove(move);
+        m_Board.unmakeMove();
 
         if (m_ShouldStop)
             return 0;

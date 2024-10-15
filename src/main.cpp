@@ -39,7 +39,7 @@ uint64_t perft(Board& board, int depth)
     {
         board.makeMove(move);
         uint64_t subNodes = perft<false>(board, depth - 1);
-        board.unmakeMove(move);
+        board.unmakeMove();
         if constexpr (root)
             std::cout << moveToStr(move) << ": " << subNodes << std::endl;
         nodes += subNodes;
@@ -141,7 +141,7 @@ void genOpeningsImpl(Board& board, int depth)
     {
         board.makeMove(move);
         genOpeningsImpl(board, depth - 1);
-        board.unmakeMove(move);
+        board.unmakeMove();
     }
 }
 

@@ -17,6 +17,8 @@ public:
     void setBoard(const Board& board);
     SearchResult runSearch(const SearchLimits& limits, bool report = true);
     uint64_t runBenchSearch(const SearchLimits& limits);
+
+    void newGame();
 private:
     int search(int alpha, int beta, int depth, int ply);
 

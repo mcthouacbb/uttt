@@ -3,17 +3,25 @@
 #include "types.h"
 #include "bitboard.h"
 #include "attacks.h"
+#include "zobrist.h"
 #include <vector>
 
 struct BoardState
 {
-    Bitboard subBoards[9][2];
+    Bitboard subBoards[2][9];
     Bitboard won[2];
     Bitboard drawn;
 
     int subBoardIdx;
+    ZKey key;
 
     Square prevSquare;
+
+    void addPiece(Color color, Square square)
+    {
+        subBoards[static_cast<int>(color)][square.subBoard()] |= Bitboard::fromSquare(square.subSquare());
+        key.addPiece(color, square);
+    }
 };
 
 class Board
@@ -24,7 +32,7 @@ public:
     void setToFen(std::string_view fen);
 
     void makeMove(Move move);
-    void unmakeMove(Move move);
+    void unmakeMove();
 
     std::string stringRep() const;
     std::string fenStr() const;
@@ -51,7 +59,7 @@ private:
 
 inline Bitboard Board::subBoard(Color color, int subBoardIdx) const
 {
-    return state().subBoards[subBoardIdx][static_cast<int>(color)];
+    return state().subBoards[static_cast<int>(color)][subBoardIdx];
 }
 
 inline Bitboard Board::wonBoards(Color color) const

@@ -26,7 +26,9 @@ set(SRCS
     "src/time_man.cpp"
     "src/time_man.h"
     "src/types.h"
+    "src/zobrist.h"
 
+    "src/util/prng.h"
     "src/util/static_vector.h"
 )
 

@@ -29,13 +29,13 @@ void Board::setToFen(std::string_view fen)
         {
             case 'x':
             {
-                state().subBoards[sq.subBoard()][static_cast<int>(Color::X)] |= Bitboard::fromSquare(sq.subSquare());
+                state().addPiece(Color::X, sq);
                 currSq++;
                 break;
             }
             case 'o':
             {
-                state().subBoards[sq.subBoard()][static_cast<int>(Color::O)] |= Bitboard::fromSquare(sq.subSquare());
+                state().addPiece(Color::O, sq);
                 currSq++;
                 break;
             }
@@ -72,13 +72,13 @@ void Board::setToFen(std::string_view fen)
 
     for (int i = 0; i < 9; i++)
     {
-        if (attacks::boardIsWon(state().subBoards[i][static_cast<int>(Color::X)]))
+        if (attacks::boardIsWon(subBoard(Color::X, i)))
             state().won[static_cast<int>(Color::X)] |= Bitboard::fromSquare(i);
 
-        if (attacks::boardIsWon(state().subBoards[i][static_cast<int>(Color::O)]))
+        if (attacks::boardIsWon(subBoard(Color::O, i)))
             state().won[static_cast<int>(Color::O)] |= Bitboard::fromSquare(i);
 
-        if ((state().subBoards[i][0] | state().subBoards[i][1]) == IN_BOARD)
+        if ((subBoard(Color::X, i) | subBoard(Color::O, i)) == IN_BOARD)
             state().drawn |= Bitboard::fromSquare(i);
     }
 }
@@ -127,16 +127,17 @@ void Board::makeMove(Move move)
 {
     m_BoardStates.push_back(state());
     auto& newState = state();
-    auto& subBoard = newState.subBoards[move.to.subBoard()][static_cast<int>(m_SideToMove)];
-    subBoard |= Bitboard::fromSquare(move.to.subSquare());
+    newState.addPiece(m_SideToMove, move.to);
 
-    if (attacks::boardIsWon(subBoard))
+    if (attacks::boardIsWon(subBoard(m_SideToMove, move.to.subBoard())))
         newState.won[static_cast<int>(m_SideToMove)] |= Bitboard::fromSquare(move.to.subBoard());
-    if ((newState.subBoards[move.to.subBoard()][0] | newState.subBoards[move.to.subBoard()][1]) == IN_BOARD)
+    if ((subBoard(Color::X, move.to.subBoard()) | subBoard(Color::O, move.to.subBoard())) == IN_BOARD)
         newState.drawn |= Bitboard::fromSquare(move.to.subBoard());
 
     newState.subBoardIdx = move.to.subSquare();
     newState.prevSquare = move.to;
+
+    newState.key.flipSideToMove();
 
     m_SideToMove = ~m_SideToMove;
 }
@@ -176,7 +177,7 @@ std::string Board::stringRep() const
     return str;
 }
 
-void Board::unmakeMove(Move move)
+void Board::unmakeMove()
 {
     m_SideToMove = ~m_SideToMove;
     m_BoardStates.pop_back();
