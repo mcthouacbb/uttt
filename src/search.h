@@ -2,6 +2,7 @@
 
 #include "board.h"
 #include "time_man.h"
+#include "tt.h"
 
 struct SearchResult
 {
@@ -18,13 +19,17 @@ public:
     SearchResult runSearch(const SearchLimits& limits, bool report = true);
     uint64_t runBenchSearch(const SearchLimits& limits);
 
-    void newGame();
+    void newGame()
+    {
+        m_TT.reset();
+    }
 private:
     int search(int alpha, int beta, int depth, int ply);
 
     Board m_Board;
     TimeMan m_TimeMan;
     Move m_RootBestMove;
+    TT m_TT;
 
     bool m_ShouldStop;
 

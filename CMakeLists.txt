@@ -25,6 +25,8 @@ set(SRCS
     "src/search.h"
     "src/time_man.cpp"
     "src/time_man.h"
+    "src/tt.cpp"
+    "src/tt.h"
     "src/types.h"
     "src/zobrist.h"
 

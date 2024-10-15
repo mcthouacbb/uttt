@@ -208,6 +208,7 @@ int main()
         {
             currBoard.setToFen("9/9/9/9/9/9/9/9/9 X 0 0000");
             player1 = currBoard.sideToMove();
+            search.newGame();
         }
         else if (tok == "position")
         {
