@@ -18,7 +18,7 @@ public:
     SearchResult runSearch(const SearchLimits& limits, bool report = true);
     uint64_t runBenchSearch(const SearchLimits& limits);
 private:
-    int search(int depth, int ply);
+    int search(int alpha, int beta, int depth, int ply);
 
     Board m_Board;
     TimeMan m_TimeMan;

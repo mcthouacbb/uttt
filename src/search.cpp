@@ -29,7 +29,7 @@ SearchResult Search::runSearch(const SearchLimits& limits, bool report)
     Move bestMove = Move{};
     for (int depth = 1; depth <= limits.maxDepth; depth++)
     {
-        int iterScore = search(depth, 0);
+        int iterScore = search(-SCORE_WIN, SCORE_WIN, depth, 0);
         if (m_ShouldStop)
             break;
         score = iterScore;
@@ -50,7 +50,7 @@ SearchResult Search::runSearch(const SearchLimits& limits, bool report)
     return SearchResult{score, bestMove};
 }
 
-int Search::search(int depth, int ply)
+int Search::search(int alpha, int beta, int depth, int ply)
 {
     // TODO: add better evaluation function
     // TODO: move evaluation into it's own file
@@ -78,7 +78,7 @@ int Search::search(int depth, int ply)
     {
         m_Nodes++;
         m_Board.makeMove(move);
-        int score = -search(depth - 1, ply + 1);
+        int score = -search(-beta, -alpha, depth - 1, ply + 1);
         m_Board.unmakeMove(move);
 
         if (m_ShouldStop)
@@ -87,8 +87,15 @@ int Search::search(int depth, int ply)
         if (score > bestScore)
         {
             bestScore = score;
-            if (root)
-                m_RootBestMove = move;
+            if (score > alpha)
+            {
+                alpha = score;
+                if (root)
+                    m_RootBestMove = move;
+            }
+
+            if (score >= beta)
+                break;
         }
     }
 
