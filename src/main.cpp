@@ -6,6 +6,7 @@
 #include "board.h"
 #include "movegen.h"
 #include "search.h"
+#include "bench.h"
 
 std::string moveToStr(Move move)
 {
@@ -378,6 +379,10 @@ int main()
             int ply;
             ss >> ply;
             genOpenings(ply);
+        }
+        else if (tok == "bench")
+        {
+            runBench();
         }
         else
         {
