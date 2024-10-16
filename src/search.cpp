@@ -26,6 +26,7 @@ SearchResult Search::runSearch(const SearchLimits& limits, bool report)
     m_Nodes = 0;
     m_TimeMan.setLimits(limits);
     m_TimeMan.startSearch();
+    m_History.fill({});
 
     int score = 0;
     Move bestMove = Move{};
@@ -72,7 +73,7 @@ int Search::search(int alpha, int beta, int depth, int ply)
     TTData ttData = {};
     bool ttHit = m_TT.probe(m_Board.key(), ttData);
 
-    MovePicker movePicker(m_Board, ttData.move);
+    MovePicker movePicker(m_Board, ttData.move, m_History);
 
     int bestScore = -SCORE_WIN;
     Move bestMove = NULL_MOVE;
@@ -100,7 +101,10 @@ int Search::search(int alpha, int beta, int depth, int ply)
             }
 
             if (score >= beta)
+            {
+                m_History[static_cast<int>(m_Board.sideToMove())][9 * move.to.y() + move.to.x()] += depth * depth;
                 break;
+            }
         }
     }
 

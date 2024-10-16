@@ -4,6 +4,7 @@
 #include <array>
 #include "types.h"
 #include "util/prng.h"
+#include "util/multi_array.h"
 
 namespace zobrist
 {
@@ -11,7 +12,7 @@ namespace zobrist
 struct Keys
 {
     uint64_t oToMove;
-    std::array<std::array<uint64_t, 81>, 2> pieceSquares;
+    MultiArray<uint64_t, 2, 81> pieceSquares;
     std::array<uint64_t, 10> currSubBoard;
 };
 

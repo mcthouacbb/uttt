@@ -32,6 +32,7 @@ set(SRCS
     "src/types.h"
     "src/zobrist.h"
 
+    "src/util/multi_array.h"
     "src/util/prng.h"
     "src/util/static_vector.h"
 )
