@@ -1,6 +1,7 @@
 #include "search.h"
 #include "movegen.h"
 #include "evaluate.h"
+#include "move_picker.h"
 
 Search::Search()
     : m_TT(64)
@@ -71,22 +72,13 @@ int Search::search(int alpha, int beta, int depth, int ply)
     TTData ttData = {};
     bool ttHit = m_TT.probe(m_Board.key(), ttData);
 
-    // TODO: actual move picker
-    MoveList moveList;
-    genMoves(m_Board, moveList);
-
-    // swap tt move to front for now
-    if (ttHit)
-    {
-        auto it = std::find(moveList.begin(), moveList.end(), ttData.move);
-        if (it != moveList.end())
-            std::iter_swap(it, moveList.begin());
-    }
+    MovePicker movePicker(m_Board, ttData.move);
 
     int bestScore = -SCORE_WIN;
     Move bestMove = NULL_MOVE;
 
-    for (Move move : moveList)
+    Move move;
+    while ((move = movePicker.pickNext()) != NULL_MOVE)
     {
         m_Nodes++;
         m_Board.makeMove(move);
