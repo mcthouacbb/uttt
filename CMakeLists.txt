@@ -21,6 +21,8 @@ set(SRCS
     "src/evaluate.h"
     "src/main.cpp"
     "src/movegen.h"
+    "src/move_picker.cpp"
+    "src/move_picker.h"
     "src/search.cpp"
     "src/search.h"
     "src/time_man.cpp"
