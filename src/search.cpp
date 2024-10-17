@@ -55,8 +55,9 @@ SearchResult Search::runSearch(const SearchLimits& limits, bool report)
 
 int Search::search(int alpha, int beta, int depth, int ply)
 {
+    int staticEval = eval::evaluate(m_Board);
     if (depth == 0)
-        return eval::evaluate(m_Board);
+        return staticEval;
     if (m_Board.isDrawn())
         return 0;
     if (m_Board.isLost())
@@ -69,6 +70,9 @@ int Search::search(int alpha, int beta, int depth, int ply)
     }
 
     bool root = ply == 0;
+
+    if (!root && depth <= 4 && staticEval - 15 * depth >= beta)
+        return staticEval;
 
     TTData ttData = {};
     bool ttHit = m_TT.probe(m_Board.key(), ply, ttData);
