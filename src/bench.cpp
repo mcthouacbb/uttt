@@ -34,7 +34,7 @@ const char* benchFens[] = {
 
 void runBench()
 {
-    constexpr int BENCH_DEPTH = 10;
+    constexpr int BENCH_DEPTH = 12;
 
     SearchLimits limits = {};
     limits.maxDepth = BENCH_DEPTH;
