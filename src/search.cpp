@@ -79,6 +79,7 @@ int Search::search(int alpha, int beta, int depth, int ply)
     Move bestMove = NULL_MOVE;
 
     Move move;
+    MoveList movesTried;
     while ((move = movePicker.pickNext()) != NULL_MOVE)
     {
         m_Nodes++;
@@ -102,10 +103,16 @@ int Search::search(int alpha, int beta, int depth, int ply)
 
             if (score >= beta)
             {
+                for (Move triedMove : movesTried)
+                {
+                    m_History[static_cast<int>(m_Board.sideToMove())][9 * triedMove.to.y() + triedMove.to.x()] -= depth * depth;
+                }
                 m_History[static_cast<int>(m_Board.sideToMove())][9 * move.to.y() + move.to.x()] += depth * depth;
                 break;
             }
         }
+
+        movesTried.push_back(move);
     }
 
     m_TT.store(m_Board.key(), bestMove);
