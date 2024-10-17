@@ -32,7 +32,7 @@ SearchResult Search::runSearch(const SearchLimits& limits, bool report)
     Move bestMove = Move{};
     for (int depth = 1; depth <= limits.maxDepth; depth++)
     {
-        int iterScore = search(-SCORE_WIN, SCORE_WIN, depth, 0);
+        int iterScore = aspWindows(depth, score);
         if (m_ShouldStop)
             break;
         score = iterScore;
@@ -51,6 +51,37 @@ SearchResult Search::runSearch(const SearchLimits& limits, bool report)
         }
     }
     return SearchResult{score, bestMove};
+}
+
+int Search::aspWindows(int depth, int prevScore)
+{
+    int alpha = -SCORE_WIN;
+    int beta = SCORE_WIN;
+    if (depth > 3)
+    {
+        alpha = prevScore - 25;
+        beta = prevScore + 25;
+    }
+    int delta = 20;
+    while (true)
+    {
+        int score = search(alpha, beta, depth, 0);
+        if (m_ShouldStop)
+            return 0;
+
+        if (alpha < score && score < beta)
+            return score;
+
+        if (score <= alpha)
+        {
+            alpha -= delta;
+        }
+        else if (score >= beta)
+        {
+            beta += delta;
+        }
+        delta *= 2;
+    }
 }
 
 int Search::search(int alpha, int beta, int depth, int ply)

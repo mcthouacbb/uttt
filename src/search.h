@@ -24,6 +24,7 @@ public:
         m_TT.reset();
     }
 private:
+    int aspWindows(int depth, int prevScore);
     int search(int alpha, int beta, int depth, int ply);
 
     Board m_Board;
