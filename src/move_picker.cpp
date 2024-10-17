@@ -1,7 +1,7 @@
 #include "move_picker.h"
 
-MovePicker::MovePicker(const Board& board, Move ttMove)
-    : m_Board(board), m_TTMove(ttMove), m_CurrIdx(0)
+MovePicker::MovePicker(const Board& board, Move ttMove, const MultiArray<int32_t, 2, 81>& history)
+    : m_Board(board), m_TTMove(ttMove), m_CurrIdx(0), m_History(history)
 {
     genMoves(m_Board, m_Moves);
     for (int i = 0; i < m_Moves.size(); i++)
@@ -27,5 +27,5 @@ int32_t MovePicker::scoreMove(Move move) const
 {
     if (move == m_TTMove)
         return 100000000;
-    return 0;
+    return m_History[static_cast<int>(m_Board.sideToMove())][9 * move.to.y() + move.to.x()];
 }

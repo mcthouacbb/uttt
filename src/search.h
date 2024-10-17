@@ -31,6 +31,8 @@ private:
     Move m_RootBestMove;
     TT m_TT;
 
+    MultiArray<int32_t, 2, 81> m_History;
+
     bool m_ShouldStop;
 
     uint64_t m_Nodes;
