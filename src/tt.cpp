@@ -75,18 +75,24 @@ void TT::resize(size_t mb)
     reset();
 }
 
-bool TT::probe(ZKey key, TTData& data)
+bool TT::probe(ZKey key, int ply, TTData& data)
 {
     auto& entry = m_Entries[index(key.value)];
     if (entry.key != key.value)
         return false;
     data.move = entry.move;
+    data.score = retrieveScore(entry.score, ply);
+    data.depth = entry.depth;
+    data.bound = entry.bound;
     return true;
 }
 
-void TT::store(ZKey key, Move bestMove)
+void TT::store(ZKey key, int ply, Move bestMove, int score, int depth, TTBound bound)
 {
     auto& entry = m_Entries[index(key.value)];
     entry.key = key.value;
     entry.move = bestMove;
+    entry.score = storeScore(score, ply);
+    entry.depth = depth;
+    entry.bound = bound;
 }

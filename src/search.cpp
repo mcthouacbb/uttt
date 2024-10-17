@@ -71,7 +71,14 @@ int Search::search(int alpha, int beta, int depth, int ply)
     bool root = ply == 0;
 
     TTData ttData = {};
-    bool ttHit = m_TT.probe(m_Board.key(), ttData);
+    bool ttHit = m_TT.probe(m_Board.key(), ply, ttData);
+
+    if (!root && ttHit && ttData.depth >= depth && (
+        ttData.bound == TTBound::EXACT ||
+        ttData.bound == TTBound::LOWER && ttData.score >= beta ||
+        ttData.bound == TTBound::UPPER && ttData.score <= alpha
+    ))
+        return ttData.score;
 
     MovePicker movePicker(m_Board, ttData.move, m_History);
 
@@ -80,6 +87,9 @@ int Search::search(int alpha, int beta, int depth, int ply)
 
     Move move;
     MoveList movesTried;
+
+    TTBound bound = TTBound::UPPER;
+
     while ((move = movePicker.pickNext()) != NULL_MOVE)
     {
         m_Nodes++;
@@ -97,6 +107,7 @@ int Search::search(int alpha, int beta, int depth, int ply)
             {
                 alpha = score;
                 bestMove = move;
+                bound = TTBound::EXACT;
                 if (root)
                     m_RootBestMove = move;
             }
@@ -108,6 +119,7 @@ int Search::search(int alpha, int beta, int depth, int ply)
                     m_History[static_cast<int>(m_Board.sideToMove())][9 * triedMove.to.y() + triedMove.to.x()] -= depth * depth;
                 }
                 m_History[static_cast<int>(m_Board.sideToMove())][9 * move.to.y() + move.to.x()] += depth * depth;
+                bound = TTBound::LOWER;
                 break;
             }
         }
@@ -115,7 +127,7 @@ int Search::search(int alpha, int beta, int depth, int ply)
         movesTried.push_back(move);
     }
 
-    m_TT.store(m_Board.key(), bestMove);
+    m_TT.store(m_Board.key(), ply, bestMove, bestScore, depth, bound);
 
     return bestScore;
 }

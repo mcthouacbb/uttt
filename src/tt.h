@@ -2,15 +2,29 @@
 
 #include "board.h"
 
+enum class TTBound : uint8_t
+{
+    NONE,
+    UPPER,
+    LOWER,
+    EXACT
+};
+
 struct TTEntry
 {
     uint64_t key;
+    int16_t score;
     Move move;
+    uint8_t depth;
+    TTBound bound;
 };
 
 struct TTData
 {
     Move move;
+    int score;
+    int depth;
+    TTBound bound;
 };
 
 class TT
@@ -24,8 +38,8 @@ public:
 
     void resize(size_t mb);
 
-    bool probe(ZKey key, TTData& data);
-    void store(ZKey key, Move bestMove);
+    bool probe(ZKey key, int ply, TTData& data);
+    void store(ZKey key, int ply, Move bestMove, int score, int depth, TTBound bound);
 
     void reset()
     {
