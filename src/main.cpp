@@ -278,15 +278,15 @@ int main()
             }
             else if (tok == "result")
             {
-                if (currBoard.isDrawn())
-                    std::cout << "response draw" << std::endl;
-                else if (currBoard.isLost())
+                if (currBoard.isLost())
                 {
                     if (currBoard.sideToMove() == player1)
                         std::cout << "response p2win" << std::endl;
                     else
                         std::cout << "response p1win" << std::endl;
                 }
+                else if (currBoard.isDrawn())
+                    std::cout << "response draw" << std::endl;
                 else
                     std::cout << "response none" << std::endl;
             }
