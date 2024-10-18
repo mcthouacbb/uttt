@@ -91,10 +91,10 @@ int Search::search(int alpha, int beta, int depth, int ply)
     int staticEval = eval::evaluate(m_Board);
     if (depth == 0)
         return staticEval;
-    if (m_Board.isDrawn())
-        return 0;
     if (m_Board.isLost())
         return -SCORE_WIN + ply;
+    if (m_Board.isDrawn())
+        return 0;
 
     if (m_Nodes % 512 == 0 && m_TimeMan.shouldStopHard())
     {
