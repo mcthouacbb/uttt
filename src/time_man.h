@@ -25,12 +25,14 @@ public:
     void setLimits(const SearchLimits& limits);
     void startSearch();
 
-    bool shouldStop() const;
+    bool shouldStopSoft() const;
+    bool shouldStopHard() const;
 
     Duration elapsed() const;
 private:
     SearchLimits m_Limits;
 
     TimePoint m_StartTime;
+    Duration m_SoftLimit;
     Duration m_HardLimit;
 };
