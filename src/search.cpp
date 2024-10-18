@@ -49,6 +49,8 @@ SearchResult Search::runSearch(const SearchLimits& limits, bool report)
                 << " pv " << bestMove.to.toString()
                 << std::endl;
         }
+        if (m_TimeMan.shouldStopSoft())
+            break;
     }
     return SearchResult{score, bestMove};
 }
@@ -94,7 +96,7 @@ int Search::search(int alpha, int beta, int depth, int ply)
     if (m_Board.isLost())
         return -SCORE_WIN + ply;
 
-    if (m_Nodes % 512 == 0 && m_TimeMan.shouldStop())
+    if (m_Nodes % 512 == 0 && m_TimeMan.shouldStopHard())
     {
         m_ShouldStop = true;
         return 0;
