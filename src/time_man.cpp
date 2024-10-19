@@ -22,20 +22,27 @@ void TimeMan::startSearch()
     m_StartTime = std::chrono::steady_clock::now();
 }
 
-bool TimeMan::shouldStopSoft() const
+bool TimeMan::shouldStopSoft(uint64_t nodes) const
 {
     Duration time = elapsed();
     if (m_Limits.clock.enabled && time > m_SoftLimit)
         return true;
+    if (m_Limits.softNodes > 0 && nodes > m_Limits.softNodes)
+        return true;
     return false;
 }
 
-bool TimeMan::shouldStopHard() const
+bool TimeMan::shouldStopHard(uint64_t nodes) const
 {
-    Duration time = elapsed();
-    if (m_Limits.maxTime > Duration(0) && time > m_Limits.maxTime)
-        return true;
-    if (m_Limits.clock.enabled && time > m_HardLimit)
+    if (nodes % 512 == 0)
+    {
+        Duration time = elapsed();
+        if (m_Limits.maxTime > Duration(0) && time > m_Limits.maxTime)
+            return true;
+        if (m_Limits.clock.enabled && time > m_HardLimit)
+            return true;
+    }
+    if (m_Limits.nodes > 0 && nodes > m_Limits.nodes)
         return true;
     return false;
 }

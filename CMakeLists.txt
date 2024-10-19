@@ -17,6 +17,8 @@ set(SRCS
     "src/bitboard.h"
     "src/board.cpp"
     "src/board.h"
+    "src/datagen.cpp"
+    "src/datagen.h"
     "src/evaluate.cpp"
     "src/evaluate.h"
     "src/main.cpp"

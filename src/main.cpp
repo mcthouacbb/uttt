@@ -7,6 +7,7 @@
 #include "movegen.h"
 #include "search.h"
 #include "bench.h"
+#include "datagen.h"
 
 std::string moveToStr(Move move)
 {
@@ -176,8 +177,15 @@ void runPerftSuite()
     std::cout << "NPS: " << std::fixed << totalNodes / time << std::endl;
 }
 
-int main()
+int main(int argc, char** argv)
 {
+    if (argc > 1 && argv[1] == "datagen")
+    {
+        int numThreads = argc > 2 ? std::stoi(argv[2]) : 1;
+        runDatagen(numThreads, "positions");
+        return 0;
+    }
+
     std::random_device rd;
     std::mt19937 rng(rd());
     //runPerftSuite();
