@@ -45,8 +45,6 @@ uint64_t perft(Board& board, int depth)
         nodes += subNodes;
     }
 
-    if constexpr (root)
-        std::cout << nodes << std::endl;
     return nodes;
 }
 
@@ -386,6 +384,18 @@ int main()
         else if (tok == "bench")
         {
             runBench();
+        }
+        else if (tok == "perft")
+        {
+            int depth;
+            ss >> depth;
+            auto t1 = std::chrono::steady_clock::now();
+            int nodes = perft<true>(currBoard, depth);
+            auto t2 = std::chrono::steady_clock::now();
+
+            double time = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1).count();
+            std::cout << "Total nodes: " << nodes << std::endl;
+            std::cout << "NPS: " << std::fixed << nodes / time << std::endl;
         }
         else
         {
