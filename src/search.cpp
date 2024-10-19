@@ -3,6 +3,22 @@
 #include "evaluate.h"
 #include "move_picker.h"
 
+
+MultiArray<int, 256, 256> computeLMRTable()
+{
+    MultiArray<int, 256, 256> table = {};
+    for (int d = 1; d < 256; d++)
+    {
+        for (int m = 1; m < 256; m++)
+        {
+            table[d][m] = 0.74 + std::log(d) * std::log(m) / 2.8;
+        }
+    }
+    return table;
+}
+
+auto lmrTable = computeLMRTable();
+
 Search::Search()
     : m_TT(64)
 {
@@ -138,8 +154,8 @@ int Search::search(int alpha, int beta, int depth, int ply, bool pvNode)
         else
         {
             int reduction = 0;
-            if (movesPlayed >= 6 - (depth >= 5) - (depth >= 7) && depth >= 3)
-                reduction = 1;
+            if (movesPlayed >= 4 && depth >= 3)
+                reduction = lmrTable[depth][movesPlayed];
 
             score = -search(-alpha - 1, -alpha, depth - 1 - reduction, ply + 1, false);
             if (score > alpha && reduction > 0)
