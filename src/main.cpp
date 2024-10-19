@@ -373,7 +373,7 @@ int main()
         {
             std::cout << currBoard.stringRep();
             std::cout << "Side to move: " << (currBoard.sideToMove() == Color::X ? 'X' : 'O') << std::endl;
-            std::cout << "Zobrist hash: " << std::hex << (currBoard.key().value) << std::endl;
+            std::cout << "Zobrist hash: " << std::hex << (currBoard.key().value) << std::dec << std::endl;
         }
         else if (tok == "genopenings")
         {
