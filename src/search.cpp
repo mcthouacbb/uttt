@@ -67,7 +67,7 @@ int Search::aspWindows(int depth, int prevScore)
     int delta = 20;
     while (true)
     {
-        int score = search(alpha, beta, depth, 0);
+        int score = search(alpha, beta, depth, 0, true);
         if (m_ShouldStop)
             return 0;
 
@@ -86,7 +86,7 @@ int Search::aspWindows(int depth, int prevScore)
     }
 }
 
-int Search::search(int alpha, int beta, int depth, int ply)
+int Search::search(int alpha, int beta, int depth, int ply, bool pvNode)
 {
     int staticEval = eval::evaluate(m_Board);
     if (depth == 0)
@@ -104,13 +104,13 @@ int Search::search(int alpha, int beta, int depth, int ply)
 
     bool root = ply == 0;
 
-    if (!root && depth <= 4 && staticEval - 15 * depth >= beta)
+    if (!pvNode && depth <= 4 && staticEval - 15 * depth >= beta)
         return staticEval;
 
     TTData ttData = {};
     bool ttHit = m_TT.probe(m_Board.key(), ply, ttData);
 
-    if (!root && ttHit && ttData.depth >= depth && (
+    if (!pvNode && ttHit && ttData.depth >= depth && (
         ttData.bound == TTBound::EXACT ||
         ttData.bound == TTBound::LOWER && ttData.score >= beta ||
         ttData.bound == TTBound::UPPER && ttData.score <= alpha
@@ -126,12 +126,27 @@ int Search::search(int alpha, int beta, int depth, int ply)
     MoveList movesTried;
 
     TTBound bound = TTBound::UPPER;
-
+    int movesPlayed = 0;
     while ((move = movePicker.pickNext()) != NULL_MOVE)
     {
         m_Nodes++;
+        movesPlayed++;
         m_Board.makeMove(move);
-        int score = -search(-beta, -alpha, depth - 1, ply + 1);
+        int score;
+        if (movesPlayed == 1)
+            score = -search(-beta, -alpha, depth - 1, ply + 1, pvNode);
+        else
+        {
+            int reduction = 0;
+            if (movesPlayed >= 6 - (depth >= 5) - (depth >= 7) && depth >= 3)
+                reduction = 1;
+
+            score = -search(-alpha - 1, -alpha, depth - 1 - reduction, ply + 1, false);
+            if (score > alpha && reduction > 0)
+                score = -search(-alpha - 1, -alpha, depth - 1, ply + 1, false);
+            if (score > alpha && pvNode)
+                score = -search(-beta, -alpha, depth - 1, ply + 1, true);
+        }
         m_Board.unmakeMove();
 
         if (m_ShouldStop)

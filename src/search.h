@@ -25,7 +25,7 @@ public:
     }
 private:
     int aspWindows(int depth, int prevScore);
-    int search(int alpha, int beta, int depth, int ply);
+    int search(int alpha, int beta, int depth, int ply, bool pvNode);
 
     Board m_Board;
     TimeMan m_TimeMan;
