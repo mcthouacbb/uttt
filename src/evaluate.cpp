@@ -9,9 +9,9 @@ namespace eval
 // a3 b3 c3
 constexpr std::array<int, 9> psqt =
 {
-    10, 20, 10,
-    20, 30, 20,
-    10, 20, 10
+    21, 15, 22,
+    14, 28, 15,
+    22, 15, 21
 };
 
 template<Color us, bool Trace>
