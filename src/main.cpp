@@ -8,6 +8,7 @@
 #include "search.h"
 #include "bench.h"
 #include "datagen.h"
+#include "tuner/tune.h"
 
 std::string moveToStr(Move move)
 {
@@ -407,6 +408,10 @@ int main(int argc, char** argv)
             double time = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1).count();
             std::cout << "Total nodes: " << nodes << std::endl;
             std::cout << "NPS: " << std::fixed << nodes / time << std::endl;
+        }
+        else if (tok == "tune")
+        {
+            tuneMain();
         }
         else
         {

@@ -14,37 +14,59 @@ constexpr std::array<int, 9> psqt =
     10, 20, 10
 };
 
-template<Color c>
+template<Color us, bool Trace>
 int evaluatePsqt(const Board& board)
 {
     int eval = 0;
     for (int subBoard = 0; subBoard < 9; subBoard++)
     {
-        Bitboard bb = board.subBoard(c, subBoard);
+        Bitboard bb = board.subBoard(us, subBoard);
         while (bb.any())
-            eval += psqt[bb.poplsb()];
+        {
+            int sq = bb.poplsb();
+            eval += psqt[sq];
+            if constexpr (Trace)
+                TRACE_INC(psqt[sq]);
+        }
     }
     return eval;
 }
 
-template<Color c>
+template<Color us, bool Trace>
 int evaluateWonSubBoards(const Board& board)
 {
     int eval = 0;
-    Bitboard wonSubBoards = board.wonBoards(c);
+    Bitboard wonSubBoards = board.wonBoards(us);
     while (wonSubBoards.any())
     {
-        eval += 5 * psqt[wonSubBoards.poplsb()];
+        int subBoard = wonSubBoards.poplsb();
+        eval += 5 * psqt[subBoard];
+        if constexpr (Trace)
+            TRACE_ADD(psqt[subBoard], 5);
     }
     return eval;
+}
+
+template<bool Trace>
+int evaluateImpl(const Board& board)
+{
+    if constexpr (Trace)
+        currTrace = {};
+
+    int eval = 0;
+    eval += evaluatePsqt<Color::X, Trace>(board) - evaluatePsqt<Color::O, Trace>(board);
+    eval += evaluateWonSubBoards<Color::X, Trace>(board) - evaluateWonSubBoards<Color::O, Trace>(board);
+    return board.sideToMove() == Color::X ? eval : -eval;
 }
 
 int evaluate(const Board& board)
 {
-    int eval = 0;
-    eval += evaluatePsqt<Color::X>(board) - evaluatePsqt<Color::O>(board);
-    eval += evaluateWonSubBoards<Color::X>(board) - evaluateWonSubBoards<Color::O>(board);
-    return board.sideToMove() == Color::X ? eval : -eval;
+    return evaluateImpl<false>(board);
+}
+
+int evalTrace(const Board& board)
+{
+    return evaluateImpl<true>(board);
 }
 
 
