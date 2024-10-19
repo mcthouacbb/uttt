@@ -179,10 +179,13 @@ void runPerftSuite()
 
 int main(int argc, char** argv)
 {
-    if (argc > 1 && argv[1] == "datagen")
+    if (argc > 1 && std::string(argv[1]) == "datagen")
     {
+        std::cout << "Doing datagen" << std::endl;
         int numThreads = argc > 2 ? std::stoi(argv[2]) : 1;
-        runDatagen(numThreads, "positions");
+        std::string filename = argc > 3 ? argv[3] : "positions";
+        std::cout << "Threads: " << numThreads << " filename: " << filename << std::endl;
+        runDatagen(numThreads, filename);
         return 0;
     }
 
