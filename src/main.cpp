@@ -7,6 +7,8 @@
 #include "movegen.h"
 #include "search.h"
 #include "bench.h"
+#include "datagen.h"
+#include "tuner/tune.h"
 
 std::string moveToStr(Move move)
 {
@@ -176,8 +178,18 @@ void runPerftSuite()
     std::cout << "NPS: " << std::fixed << totalNodes / time << std::endl;
 }
 
-int main()
+int main(int argc, char** argv)
 {
+    if (argc > 1 && std::string(argv[1]) == "datagen")
+    {
+        std::cout << "Doing datagen" << std::endl;
+        int numThreads = argc > 2 ? std::stoi(argv[2]) : 1;
+        std::string filename = argc > 3 ? argv[3] : "positions";
+        std::cout << "Threads: " << numThreads << " filename: " << filename << std::endl;
+        runDatagen(numThreads, filename);
+        return 0;
+    }
+
     std::random_device rd;
     std::mt19937 rng(rd());
     //runPerftSuite();
@@ -396,6 +408,10 @@ int main()
             double time = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1).count();
             std::cout << "Total nodes: " << nodes << std::endl;
             std::cout << "NPS: " << std::fixed << nodes / time << std::endl;
+        }
+        else if (tok == "tune")
+        {
+            tuneMain();
         }
         else
         {

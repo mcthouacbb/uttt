@@ -9,6 +9,8 @@ struct SearchLimits
 {
     int maxDepth;
     Duration maxTime;
+    uint64_t nodes;
+    uint64_t softNodes;
     struct Clock
     {
         Duration time;
@@ -25,8 +27,8 @@ public:
     void setLimits(const SearchLimits& limits);
     void startSearch();
 
-    bool shouldStopSoft() const;
-    bool shouldStopHard() const;
+    bool shouldStopSoft(uint64_t nodes) const;
+    bool shouldStopHard(uint64_t nodes) const;
 
     Duration elapsed() const;
 private:

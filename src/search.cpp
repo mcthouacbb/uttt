@@ -44,6 +44,7 @@ SearchResult Search::runSearch(const SearchLimits& limits, bool report)
     m_TimeMan.startSearch();
     m_History.fill({});
 
+    m_RootBestMove = Move{};
     int score = 0;
     Move bestMove = Move{};
     for (int depth = 1; depth <= limits.maxDepth; depth++)
@@ -65,7 +66,7 @@ SearchResult Search::runSearch(const SearchLimits& limits, bool report)
                 << " pv " << bestMove.to.toString()
                 << std::endl;
         }
-        if (m_TimeMan.shouldStopSoft())
+        if (m_TimeMan.shouldStopSoft(m_Nodes))
             break;
     }
     return SearchResult{score, bestMove};
@@ -112,7 +113,7 @@ int Search::search(int alpha, int beta, int depth, int ply, bool pvNode)
     if (m_Board.isDrawn())
         return 0;
 
-    if (m_Nodes % 512 == 0 && m_TimeMan.shouldStopHard())
+    if (m_TimeMan.shouldStopHard(m_Nodes))
     {
         m_ShouldStop = true;
         return 0;

@@ -17,6 +17,9 @@ set(SRCS
     "src/bitboard.h"
     "src/board.cpp"
     "src/board.h"
+    "src/datagen.cpp"
+    "src/datagen.h"
+    "src/eval_constants.h"
     "src/evaluate.cpp"
     "src/evaluate.h"
     "src/main.cpp"
@@ -32,11 +35,21 @@ set(SRCS
     "src/types.h"
     "src/zobrist.h"
 
+    "src/tuner/dataset.cpp"
+    "src/tuner/dataset.h"
+    "src/tuner/eval_fn.cpp"
+    "src/tuner/eval_fn.h"
+    "src/tuner/settings.h"
+    "src/tuner/thread_pool.cpp"
+    "src/tuner/thread_pool.h"
+    "src/tuner/trace.h"
+    "src/tuner/tune.cpp"
+    "src/tuner/tune.h"
+
     "src/util/multi_array.h"
     "src/util/prng.h"
     "src/util/static_vector.h"
 )
-
 
 if("${UTTT_EXE_EXTENSION}" STREQUAL "")
     message("none")
